@@ -1,0 +1,139 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aurum API Docs</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-content">
+      <span class="brand">🍽️ Aurum API</span>
+      <nav>
+        <a href="index.html">Documentació</a>
+        <a href="equip.html">Equip</a>
+        <a href="login.html" class="login">Inicia sessió</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <ul>
+        <li><a href="#auth">Autenticació</a></li>
+        <li><a href="#menus">Menús</a></li>
+        <li><a href="#orders">Comandes</a></li>
+        <li><a href="#plats">Plats</a></li>
+        <li><a href="#users">Usuaris</a></li>
+        <li><a href="#errors">Errors</a></li>
+        <li><a href="#tips">Tips</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <h1>Aurum API</h1>
+      <p>Aquesta API RESTful permet gestionar un sistema de cuina gourmet amb menús diaris, comandes i usuaris. Totes les rutes estan protegides amb JWT si no s'indica el contrari.</p>
+
+      <section id="auth">
+        <h2>🔐 Autenticació</h2>
+        <h3>POST /auth/login</h3>
+        <p>Inicia sessió i obté un token JWT.</p>
+        <pre><code>{
+  "email": "client@aurum.com",
+  "password": "123456"
+}</code></pre>
+
+        <h3>POST /auth/register</h3>
+        <p>Registra un nou usuari (rol per defecte: <code>client</code>).</p>
+      </section>
+
+      <section id="menus">
+        <h2>📅 Menús</h2>
+        <h3>GET /menu?day=dilluns</h3>
+        <p>Retorna el menú d’un dia específic.</p>
+
+        <h3>GET /menu</h3>
+        <p>Obté tots els menús disponibles amb plats.</p>
+
+        <h3>POST /menu/generateWeeklyMenus</h3>
+        <p>Només per gestors. Genera els menús setmanals automàticament.</p>
+      </section>
+
+      <section id="orders">
+        <h2>🧾 Comandes</h2>
+        <h3>POST /order</h3>
+        <p>Crea una nova comanda. Requereix autenticació.</p>
+        <pre><code>{
+  "total": 45.90,
+  "plats": [1, 2, 5]
+}</code></pre>
+
+        <h3>GET /order</h3>
+        <p>Llista totes les comandes (només amb token).</p>
+
+        <h3>GET /order/user</h3>
+        <p>Llista les comandes de l'usuari autenticat.</p>
+
+        <h3>GET /order/{id}</h3>
+        <p>Consulta una comanda per ID (requereix token).</p>
+
+        <h3>PUT /order/status/{id}</h3>
+        <p>Actualitza l'estat d'una comanda.</p>
+
+        <h3>PUT /order/{id}</h3>
+        <p>Actualitza les dades d'una comanda específica.</p>
+
+        <h3>DELETE /order/{id}</h3>
+        <p>Elimina una comanda (requereix token).</p>
+      </section>
+
+      <section id="plats">
+        <h2>🍽️ Plats</h2>
+        <h3>GET /plat/{id}</h3>
+        <p>Consulta els detalls d’un plat (requereix token).</p>
+
+        <h3>POST /plat</h3>
+        <p>Només per gestors. Crea un nou plat.</p>
+
+        <h3>PUT /plat/{id}</h3>
+        <p>Només per gestors. Edita un plat existent.</p>
+
+        <h3>DELETE /plat/{id}</h3>
+        <p>Només per gestors. Elimina un plat.</p>
+      </section>
+
+      <section id="users">
+        <h2>👤 Usuaris</h2>
+        <h3>GET /user/usuaris</h3>
+        <p>Retorna tots els usuaris (només accessible amb el rol de gestor).</p>
+      </section>
+
+      <section id="errors">
+        <h2>⚠️ Errors comuns</h2>
+        <table>
+          <thead>
+            <tr><th>Codi</th><th>Missatge</th><th>Significat</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>400</td><td>Falten dades</td><td>El cos de la petició no és correcte o incomplet.</td></tr>
+            <tr><td>401</td><td>Accés no autoritzat</td><td>No tens token o és invàlid.</td></tr>
+            <tr><td>403</td><td>Prohibit</td><td>No tens permisos per accedir a aquesta ruta.</td></tr>
+            <tr><td>404</td><td>No trobat</td><td>L’endpoint o ID no existeix.</td></tr>
+            <tr><td>500</td><td>Error intern</td><td>Alguna cosa ha fallat al servidor.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="tips">
+        <h2>💡 Sabies que...</h2>
+        <p id="random-tip"></p>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
