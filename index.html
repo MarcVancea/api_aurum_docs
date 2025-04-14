@@ -34,9 +34,11 @@
     </aside>
 
     <main class="main-content">
-      <h1>Aurum API</h1>
-      <p>Aquesta API RESTful permet gestionar un sistema de cuina gourmet amb menús diaris, comandes i usuaris. Totes les rutes estan protegides amb JWT si no s'indica el contrari.</p>
-
+      <h1>Benvinguts a l'API  de Aurum</h1>
+      <p>Aurum és un restaurant gourmet que combina l'experiència gastronòmica amb la comoditat de la gestió en línia. Aquesta plataforma permet als usuaris explorar menús diaris, fer comandes personalitzades i seguir l'estat de les seves comandes en temps real. Al mateix temps, els administradors poden gestionar els menús, controlar les comandes i supervisar els usuaris de manera eficient.</p>
+      <p>Aquesta documentació està dissenyada per ajudar-te a integrar i utilitzar l'Aurum API, una API RESTful que proporciona totes les eines necessàries per interactuar amb el sistema. Aquí trobaràs informació detallada sobre les rutes disponibles, els requisits d'autenticació i exemples pràctics per començar a treballar amb l'API.</p>
+      <p>Explora les seccions següents per descobrir com pots aprofitar al màxim l'Aurum API i portar la gestió del teu restaurant al següent nivell.</p>
+      
       <section id="auth">
         <h2>🔐 Autenticació</h2>
         <h3>POST /auth/login</h3>
@@ -48,69 +50,342 @@
 
         <h3>POST /auth/register</h3>
         <p>Registra un nou usuari (rol per defecte: <code>client</code>).</p>
+        <pre><code>
+{
+"email": "proba@gmail.com",
+"password": "123456"
+}</code></pre>
+<h3>Exemple amb Axios</h3>
+  <p>A continuació es mostra un exemple de com fer una crida a l'endpoint de login utilitzant la llibreria <code>axios</code>:</p>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.post('http://aurum.daw.institutmontilivi.cat/auth/login', {
+  email: 'client@aurum.com',
+  password: '123456'
+})
+.then(response => {
+  console.log('Token obtingut:', response.data.token);
+})
+.catch(error => {
+  console.error('Error en la crida:', error.response.data);
+});
       </section>
 
       <section id="menus">
         <h2>📅 Menús</h2>
+      
         <h3>GET /menu?day=dilluns</h3>
         <p>Retorna el menú d’un dia específic.</p>
-
+        <pre><code class="language-json">
+      {
+        "dia_setmana": "dilluns",
+        "preuBase": "80.00",
+        "entrants": [
+          {
+            "id": 45,
+            "nom": "Amanida de quinoa",
+            "descripcio": "Amanida fresca amb quinoa, alvocat i magrana",
+            "suplament": "0.00",
+            "imatge": "imatges_plats/imatges_45.jpg"
+          }
+        ]
+      }
+        </code></pre>
+      
         <h3>GET /menu</h3>
         <p>Obté tots els menús disponibles amb plats.</p>
+        <pre><code class="language-json">
+      [
+        {
+          "dia_setmana": "dijous",
+          "preuBase": "100.00",
+          "entrants": [
+            {
+              "id": 86,
+              "nom": "Caviar Beluga amb Blinis",
+              "descripcio": "Caviar Beluga 000 amb blinis de fajol i crema frache",
+              "suplament": "0.00",
+              "imatge": "imatges_plats/imatges_86.jpg"
+            }
+          ]
+        }
+        ...
 
+      ]
+        </code></pre>
+      
         <h3>POST /menu/generateWeeklyMenus</h3>
         <p>Només per gestors. Genera els menús setmanals automàticament.</p>
+        <pre><code class="language-javascript">
+      // Exemple de crida amb Axios
+      axios.post('http://aurum.daw.institutmontilivi.cat/menu/generateWeeklyMenus')
+        .then(response => {
+          console.log('Menús generats:', response.data);
+        })
+        .catch(error => {
+          console.error('Error en la generació:', error.response.data);
+        });
+        </code></pre>
       </section>
 
-      <section id="orders">
-        <h2>🧾 Comandes</h2>
-        <h3>POST /order</h3>
-        <p>Crea una nova comanda. Requereix autenticació.</p>
-        <pre><code>{
+    <section id="orders">
+  <h2>🧾 Comandes</h2>
+
+  <h3>POST /order</h3>
+  <p>Crea una nova comanda. Requereix autenticació.</p>
+  <pre><code class="language-json">
+{
   "total": 45.90,
   "plats": [1, 2, 5]
-}</code></pre>
+}
+  </code></pre>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.post('http://aurum.daw.institutmontilivi.cat/order', {
+  total: 45.90,
+  plats: [1, 2, 5]
+}, {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Comanda creada:', response.data);
+})
+.catch(error => {
+  console.error('Error en crear la comanda:', error.response.data);
+});
+  </code></pre>
 
-        <h3>GET /order</h3>
-        <p>Llista totes les comandes (només amb token).</p>
+  <h3>GET /order</h3>
+  <p>Llista totes les comandes (només amb token).</p>
+  <pre><code class="language-json">
+[
+  {
+    "id": 1,
+    "total": 45.90,
+    "estat": "pendent",
+    "plats": [1, 2, 5]
+  },
+  {
+    "id": 2,
+    "total": 30.50,
+    "estat": "en preparació",
+    "plats": [3, 4]
+  }
+]
+  </code></pre>
 
-        <h3>GET /order/user</h3>
-        <p>Llista les comandes de l'usuari autenticat.</p>
+  <h3>GET /order/user</h3>
+  <p>Llista les comandes de l'usuari autenticat.</p>
+  <pre><code class="language-json">
+[
+  {
+    "id": 1,
+    "total": 45.90,
+    "estat": "pendent",
+    "plats": [1, 2, 5]
+  }
+]
+  </code></pre>
 
-        <h3>GET /order/{id}</h3>
-        <p>Consulta una comanda per ID (requereix token).</p>
+  <h3>GET /order/{id}</h3>
+  <p>Consulta una comanda per ID (requereix token).</p>
+  <pre><code class="language-json">
+{
+  "id": 1,
+  "total": 45.90,
+  "estat": "pendent",
+  "plats": [
+    {
+      "id": 1,
+      "nom": "Amanida de quinoa",
+      "quantitat": 1
+    },
+    {
+      "id": 2,
+      "nom": "Canelons de bolets",
+      "quantitat": 2
+    }
+  ]
+}
+  </code></pre>
 
-        <h3>PUT /order/status/{id}</h3>
-        <p>Actualitza l'estat d'una comanda.</p>
+  <h3>PUT /order/status/{id}</h3>
+  <p>Actualitza l'estat d'una comanda.</p>
+  <pre><code class="language-json">
+{
+  "estat": "en preparació"
+}
+  </code></pre>
 
-        <h3>PUT /order/{id}</h3>
-        <p>Actualitza les dades d'una comanda específica.</p>
+  <h3>PUT /order/{id}</h3>
+  <p>Actualitza les dades d'una comanda específica.</p>
+  <pre><code class="language-json">
+{
+  "total": 50.00,
+  "plats": [1, 3]
+}
+  </code></pre>
 
-        <h3>DELETE /order/{id}</h3>
-        <p>Elimina una comanda (requereix token).</p>
-      </section>
+  <h3>DELETE /order/{id}</h3>
+  <p>Elimina una comanda (requereix token).</p>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.delete('http://aurum.daw.institutmontilivi.cat/order/1', {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Comanda eliminada:', response.data);
+})
+.catch(error => {
+  console.error('Error en eliminar la comanda:', error.response.data);
+});
+  </code></pre>
+</section>
 
-      <section id="plats">
-        <h2>🍽️ Plats</h2>
-        <h3>GET /plat/{id}</h3>
-        <p>Consulta els detalls d’un plat (requereix token).</p>
+<section id="plats">
+  <h2>🍽️ Plats</h2>
 
-        <h3>POST /plat</h3>
-        <p>Només per gestors. Crea un nou plat.</p>
+  <h3>GET /plat/{id}</h3>
+  <p>Consulta els detalls d’un plat (requereix token).</p>
+  <pre><code class="language-json">
+{
+  "id": 86,
+  "nom": "Caviar Beluga amb Blinis",
+  "descripcio": "Caviar Beluga 000 amb blinis de fajol i crema frache",
+  "suplament": "0.00",
+  "imatge": "imatges_plats/imatges_86.jpg"
+}
+  </code></pre>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.get('http://aurum.daw.institutmontilivi.cat/plat/86', {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Detalls del plat:', response.data);
+})
+.catch(error => {
+  console.error('Error en consultar el plat:', error.response.data);
+});
+  </code></pre>
 
-        <h3>PUT /plat/{id}</h3>
-        <p>Només per gestors. Edita un plat existent.</p>
+  <h3>POST /plat</h3>
+  <p>Només per gestors. Crea un nou plat.</p>
+  <pre><code class="language-json">
+{
+  "nom": "Risotto de bolets",
+  "descripcio": "Risotto cremós amb bolets frescos i parmesà",
+  "suplament": "2.50",
+  "imatge": "imatges_plats/imatges_risotto.jpg"
+}
+  </code></pre>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.post('http://aurum.daw.institutmontilivi.cat/plat', {
+  nom: 'Risotto de bolets',
+  descripcio: 'Risotto cremós amb bolets frescos i parmesà',
+  suplament: '2.50',
+  imatge: 'imatges_plats/imatges_risotto.jpg'
+}, {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Plat creat:', response.data);
+})
+.catch(error => {
+  console.error('Error en crear el plat:', error.response.data);
+});
+  </code></pre>
 
-        <h3>DELETE /plat/{id}</h3>
-        <p>Només per gestors. Elimina un plat.</p>
-      </section>
+  <h3>PUT /plat/{id}</h3>
+  <p>Només per gestors. Edita un plat existent.</p>
+  <pre><code class="language-json">
+{
+  "nom": "Risotto de bolets (actualitzat)",
+  "descripcio": "Risotto cremós amb bolets frescos i parmesà (actualitzat)",
+  "suplament": "3.00"
+}
+  </code></pre>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.put('http://aurum.daw.institutmontilivi.cat/plat/86', {
+  nom: 'Risotto de bolets (actualitzat)',
+  descripcio: 'Risotto cremós amb bolets frescos i parmesà (actualitzat)',
+  suplament: '3.00'
+}, {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Plat actualitzat:', response.data);
+})
+.catch(error => {
+  console.error('Error en actualitzar el plat:', error.response.data);
+});
+  </code></pre>
 
-      <section id="users">
-        <h2>👤 Usuaris</h2>
-        <h3>GET /user/usuaris</h3>
-        <p>Retorna tots els usuaris (només accessible amb el rol de gestor).</p>
-      </section>
+  <h3>DELETE /plat/{id}</h3>
+  <p>Només per gestors. Elimina un plat.</p>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.delete('http://aurum.daw.institutmontilivi.cat/plat/86', {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Plat eliminat:', response.data);
+})
+.catch(error => {
+  console.error('Error en eliminar el plat:', error.response.data);
 
+</section>
+
+<section id="users">
+  <h2>👤 Usuaris</h2>
+
+  <h3>GET /user/usuaris</h3>
+  <p>Retorna tots els usuaris (només accessible amb el rol de gestor).</p>
+  <pre><code class="language-json">
+[
+  {
+    "id": 1,
+    "nom": "Joan",
+    "email": "joan@example.com",
+    "rol": "client"
+  },
+  {
+    "id": 2,
+    "nom": "Maria",
+    "email": "maria@example.com",
+    "rol": "gestor"
+  }
+]
+  </code></pre>
+  <pre><code class="language-javascript">
+// Exemple de crida amb Axios
+axios.get('http://aurum.daw.institutmontilivi.cat/user/usuaris', {
+  headers: {
+    Authorization: 'Bearer <el_teu_token>'
+  }
+})
+.then(response => {
+  console.log('Llista d\'usuaris:', response.data);
+})
+.catch(error => {
+  console.error('Error en obtenir els usuaris:', error.response.data);
+});
+  </code></pre>
+</section>
       <section id="errors">
         <h2>⚠️ Errors comuns</h2>
         <table>
